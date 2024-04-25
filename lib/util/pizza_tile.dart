@@ -1,12 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class pizzaTile extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
+class pizzaTile extends StatefulWidget {
   final String pizzaFlavor;
   final String pizzaPrice;
   final pizzaColor;
   final String imageName;
-
-  final double borderRadius = 12;
 
   const pizzaTile({
     super.key,
@@ -17,12 +20,19 @@ class pizzaTile extends StatelessWidget {
   });
 
   @override
+  State<pizzaTile> createState() => _pizzaTileState();
+}
+
+class _pizzaTileState extends State<pizzaTile> {
+  final double borderRadius = 12;
+  bool isClicked = true;
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Container(
         decoration: BoxDecoration(
-          color: pizzaColor[50],
+          color: widget.pizzaColor[50],
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -33,7 +43,7 @@ class pizzaTile extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: pizzaColor[100],
+                    color: widget.pizzaColor[100],
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(borderRadius),
                       topRight: Radius.circular(borderRadius),
@@ -41,9 +51,9 @@ class pizzaTile extends StatelessWidget {
                   ),
                   padding: EdgeInsets.all(borderRadius),
                   child: Text(
-                    '\$' + pizzaPrice,
+                    '\$' + widget.pizzaPrice,
                     style: TextStyle(
-                      color: pizzaColor[800],
+                      color: widget.pizzaColor[800],
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -55,17 +65,17 @@ class pizzaTile extends StatelessWidget {
             // donut image
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 46,
-                vertical: 16,
+                horizontal: 52,
+                vertical: 7,
               ),
               child: Image.asset(
-                imageName,
+                widget.imageName,
               ),
             ),
 
             // donut flavor
             Text(
-              pizzaFlavor,
+              widget.pizzaFlavor,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -87,14 +97,24 @@ class pizzaTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // love icon
-                  Icon(
-                    Icons.favorite_outline,
-                    color: Colors.pink,
+                  IconButton(
+                    icon: isClicked
+                        ? Icon(Icons.favorite_outline, color: Colors.pink)
+                        : Icon(Icons.favorite, color: Colors.pink),
+                    onPressed: () {
+                      setState(() {
+                        isClicked = !isClicked;
+                      });
+                    },
+                    color: Colors.grey[900],
                   ),
-              
+
                   // add button
-                  Icon(
-                    Icons.add,
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      _showIngredientsModal(context);
+                    },
                     color: Colors.grey[900],
                   ),
                 ],
@@ -103,6 +123,88 @@ class pizzaTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showIngredientsModal(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: LottieBuilder.asset('assets/animations/food.json'),
+        );
+      },
+    );
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${dotenv.env['token']!.trim()}',
+      },
+      body: jsonEncode(
+        {
+          "model": "gpt-3.5-turbo",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "Provide main ingredients of ${widget.pizzaFlavor} pizza only nothing else."
+            }
+          ],
+        },
+      ),
+    );
+
+    final jsonResponse = jsonDecode(response.body);
+    final ingredients = jsonResponse['choices'][0]['message']['content'];
+    // Close loading indicator
+    Navigator.of(context).pop();
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image
+                Image.asset(
+                  widget.imageName,
+                  width: MediaQuery.of(context).size.width,
+                  height: 200,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 16),
+                // Name
+                Text(
+                  widget.pizzaFlavor,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                // Ingredients
+                Text(
+                  "Ingredients:",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  ingredients,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

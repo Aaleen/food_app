@@ -5,10 +5,10 @@ class smoothieTab extends StatelessWidget {
   // list of donuts
   List donutsOnSale = [
     // [smoothieFlavor, donutPrice, donutColor, imageName]
-    ["Vanilla", "110", Colors.brown, "assets/images/donut-1.png"],
-    ["KitKat", "140", Colors.pink, "assets/images/donut-4.png"],
-    ["Oreo", "50", Colors.blue, "assets/images/donut-2.png"],
-    ["Cookies", "50", Colors.orange, "assets/images/donut-2.png"],
+    ["Banana", "110", Colors.brown, "assets/images/banana-smoothie.png"],
+    ["Mango", "140", Colors.pink, "assets/images/smoothie-mango.png"],
+    ["Strawberry", "50", Colors.blue, "assets/images/smoothie-strawberry.png"],
+    ["Mint", "50", Colors.orange, "assets/images/smoothie-mint.png"],
     
   ];
 

@@ -5,10 +5,10 @@ class burgerTab extends StatelessWidget {
   // list of donuts
   List donutsOnSale = [
     // [burgerFlavor, donutPrice, donutColor, imageName]
-    ["Cheese", "110", Colors.brown, "assets/images/donut-1.png"],
-    ["Zinger", "140", Colors.pink, "assets/images/donut-4.png"],
-    ["Beef", "50", Colors.blue, "assets/images/donut-2.png"],
-    ["Veg", "10", Colors.red, "assets/images/donut-3.png"],
+    ["Cheese", "110", Colors.brown, "assets/images/cheese-burger.png"],
+    ["Zinger", "140", Colors.pink, "assets/images/burger-bar.png"],
+    ["Beef", "50", Colors.blue, "assets/images/zinger-burger.png"],
+    ["Veg", "10", Colors.red, "assets/images/vegan-burger.png"],
   ];
 
   @override

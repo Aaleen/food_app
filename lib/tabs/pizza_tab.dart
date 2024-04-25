@@ -6,10 +6,10 @@ class pizzaTab extends StatelessWidget {
   // list of donuts
   List donutsOnSale = [
     // [pizzaFlavor, donutPrice, donutColor, imageName]
-    ["Fajita", "110", Colors.brown, "assets/images/donut-1.png"],
-    ["Afghani", "140", Colors.pink, "assets/images/donut-4.png"],
-    ["Tikka", "50", Colors.blue, "assets/images/donut-2.png"],
-    ["Cheesy", "50", Colors.orange, "assets/images/donut-2.png"],
+    ["Fajita", "110", Colors.brown, "assets/images/pizza-fajita.png"],
+    ["Afghani", "140", Colors.pink, "assets/images/pizza-afghani.png"],
+    ["Tikka", "50", Colors.blue, "assets/images/pizza-tika.png"],
+    ["Cheesy", "50", Colors.orange, "assets/images/pizza-cheese.png"],
     
   ];
 

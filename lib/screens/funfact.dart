@@ -101,7 +101,13 @@ class _RecipeOrFunFactPageState extends State<RecipeOrFunFactPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Recipe or Fun Fact of the Day'),
+        title: Text(
+          "Tastebuds to Trivia: Your Daily Fix Awaits!",
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Center(
         child: Padding(
@@ -114,12 +120,13 @@ class _RecipeOrFunFactPageState extends State<RecipeOrFunFactPage> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: Colors.grey[800]
                 ),
               ),
               SizedBox(height: 20),
               isLoading
                   ? Lottie.asset(
-                      'assets/images/food.json',
+                      'assets/animations/food.json',
                       height: 100,
                       width: 100,
                     )
@@ -127,11 +134,20 @@ class _RecipeOrFunFactPageState extends State<RecipeOrFunFactPage> {
                       responseText,
                       style: TextStyle(
                         fontSize: 18,
+                        color: Colors.grey[800]
                       ),
                       textAlign: TextAlign.center,
                     ),
               SizedBox(height: 20),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.indigo[100], // Change this to your desired color
+                  // Other properties you can customize:
+                  // onPrimary: Colors.white,
+                  // shadowColor: Colors.black,
+                  // elevation: 5,
+                  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
                 onPressed: () {
                   setState(() {
                     isLoading = true;
@@ -139,7 +155,7 @@ class _RecipeOrFunFactPageState extends State<RecipeOrFunFactPage> {
                   getRandomFoodItem();
                   fetchRecipeOrFunFact();
                 },
-                child: Text('Generate Another'),
+                child: Text('Generate Another', style: TextStyle(color: Colors.grey[800]),),
               ),
             ],
           ),

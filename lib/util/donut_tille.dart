@@ -5,13 +5,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 
-class DonutTile extends StatelessWidget {
+class DonutTile extends StatefulWidget {
   final String donutFlavor;
   final String donutPrice;
   final donutColor;
   final String imageName;
-
-  final double borderRadius = 12;
 
   const DonutTile({
     super.key,
@@ -22,12 +20,20 @@ class DonutTile extends StatelessWidget {
   });
 
   @override
+  State<DonutTile> createState() => _DonutTileState();
+}
+
+class _DonutTileState extends State<DonutTile> {
+  final double borderRadius = 12;
+  bool isClicked = true;
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Container(
         decoration: BoxDecoration(
-          color: donutColor[50],
+          color: widget.donutColor[50],
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -38,7 +44,7 @@ class DonutTile extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: donutColor[100],
+                    color: widget.donutColor[100],
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(borderRadius),
                       topRight: Radius.circular(borderRadius),
@@ -46,9 +52,9 @@ class DonutTile extends StatelessWidget {
                   ),
                   padding: EdgeInsets.all(borderRadius),
                   child: Text(
-                    '\$' + donutPrice,
+                    '\$' + widget.donutPrice,
                     style: TextStyle(
-                      color: donutColor[800],
+                      color: widget.donutColor[800],
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -60,17 +66,17 @@ class DonutTile extends StatelessWidget {
             // donut image
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 46,
-                vertical: 16,
+                horizontal: 52,
+                vertical: 7,
               ),
               child: Image.asset(
-                imageName,
+                widget.imageName,
               ),
             ),
 
             // donut flavor
             Text(
-              donutFlavor,
+              widget.donutFlavor,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -91,20 +97,37 @@ class DonutTile extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // love icon
-                  Icon(
-                    Icons.favorite_outline,
-                    color: Colors.pink,
-                  ),
-
-                  // add button
-                  IconButton(
-                    icon: Icon(Icons.add),
+                  // // love icon
+                  // Icon(
+                  //   Icons.favorite_outline,
+                  //   color: Colors.pink,
+                  // ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors
+                          .deepOrange[100], // Change this to your desired color
+                      // Other properties you can customize:
+                      // onPrimary: Colors.white,
+                      // shadowColor: Colors.black,
+                      // elevation: 5,
+                      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                     onPressed: () {
                       _showIngredientsModal(context);
                     },
-                    color: Colors.grey[900],
+                    child: Text(
+                      'Ingredients',
+                      style: TextStyle(color: Colors.grey[800], fontSize: 9),
+                    ),
                   ),
+                  // add button
+                  // IconButton(
+                  //   icon: Icon(Icons.add),
+                  //   onPressed: () {
+                  //     _showIngredientsModal(context);
+                  //   },
+                  //   color: Colors.grey[900],
+                  // ),
                 ],
               ),
             ),
@@ -120,7 +143,7 @@ class DonutTile extends StatelessWidget {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Center(
-          child: LottieBuilder.asset('assets/images/food.json'),
+          child: LottieBuilder.asset('assets/animations/food.json'),
         );
       },
     );
@@ -137,7 +160,7 @@ class DonutTile extends StatelessWidget {
             {
               "role": "system",
               "content":
-                  "Provide main ingredients of $donutFlavor donut only nothing else."
+                  "Provide main ingredients of ${widget.donutFlavor} donut only nothing else."
             }
           ],
         },
@@ -160,7 +183,7 @@ class DonutTile extends StatelessWidget {
               children: [
                 // Image
                 Image.asset(
-                  imageName,
+                  widget.imageName,
                   width: MediaQuery.of(context).size.width,
                   height: 200,
                   fit: BoxFit.contain,
@@ -168,7 +191,7 @@ class DonutTile extends StatelessWidget {
                 SizedBox(height: 16),
                 // Name
                 Text(
-                  donutFlavor,
+                  widget.donutFlavor,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

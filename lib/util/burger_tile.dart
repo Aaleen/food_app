@@ -5,13 +5,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
 
-class burgerTile extends StatelessWidget {
+class burgerTile extends StatefulWidget {
   final String burgerFlavor;
   final String burgerPrice;
   final burgerColor;
   final String imageName;
-
-  final double borderRadius = 12;
 
   const burgerTile({
     super.key,
@@ -22,12 +20,19 @@ class burgerTile extends StatelessWidget {
   });
 
   @override
+  State<burgerTile> createState() => _burgerTileState();
+}
+
+class _burgerTileState extends State<burgerTile> {
+  final double borderRadius = 12;
+  bool isClicked = true;
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Container(
         decoration: BoxDecoration(
-          color: burgerColor[50],
+          color: widget.burgerColor[50],
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -38,7 +43,7 @@ class burgerTile extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: burgerColor[100],
+                    color: widget.burgerColor[100],
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(borderRadius),
                       topRight: Radius.circular(borderRadius),
@@ -46,9 +51,9 @@ class burgerTile extends StatelessWidget {
                   ),
                   padding: EdgeInsets.all(borderRadius),
                   child: Text(
-                    '\$' + burgerPrice,
+                    '\$' + widget.burgerPrice,
                     style: TextStyle(
-                      color: burgerColor[800],
+                      color: widget.burgerColor[800],
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -57,20 +62,20 @@ class burgerTile extends StatelessWidget {
               ],
             ),
 
-            // donut image
+            // burger image
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 46,
-                vertical: 16,
+                horizontal: 52,
+                vertical: 7,
               ),
               child: Image.asset(
-                imageName,
+                widget.imageName,
               ),
             ),
 
-            // donut flavor
+            // burger flavor
             Text(
-              burgerFlavor,
+              widget.burgerFlavor,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -92,9 +97,16 @@ class burgerTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // love icon
-                  Icon(
-                    Icons.favorite_outline,
-                    color: Colors.pink,
+                  IconButton(
+                    icon: isClicked
+                        ? Icon(Icons.favorite_outline, color: Colors.pink)
+                        : Icon(Icons.favorite, color: Colors.pink),
+                    onPressed: () {
+                      setState(() {
+                        isClicked = !isClicked;
+                      });
+                    },
+                    color: Colors.grey[900],
                   ),
 
                   // add button
@@ -120,7 +132,7 @@ class burgerTile extends StatelessWidget {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return Center(
-          child: LottieBuilder.asset('assets/images/food.json'),
+          child: LottieBuilder.asset('assets/animations/food.json'),
         );
       },
     );
@@ -137,7 +149,7 @@ class burgerTile extends StatelessWidget {
             {
               "role": "system",
               "content":
-                  "Provide main ingredients of $burgerFlavor Burger only nothing else."
+                  "Provide main ingredients of ${widget.burgerFlavor} Burger only nothing else."
             }
           ],
         },
@@ -160,7 +172,7 @@ class burgerTile extends StatelessWidget {
               children: [
                 // Image
                 Image.asset(
-                  imageName,
+                  widget.imageName,
                   width: MediaQuery.of(context).size.width,
                   height: 200,
                   fit: BoxFit.contain,
@@ -168,7 +180,7 @@ class burgerTile extends StatelessWidget {
                 SizedBox(height: 16),
                 // Name
                 Text(
-                  burgerFlavor,
+                  widget.burgerFlavor,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

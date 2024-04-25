@@ -8,6 +8,7 @@ import 'package:donut_app/tabs/pancake_tab.dart';
 import 'package:donut_app/tabs/pizza_tab.dart';
 import 'package:donut_app/tabs/smoothie_tab.dart';
 import 'package:donut_app/util/my_tab.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -59,7 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
       length: myTabs.length,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.restaurant_menu),
+          backgroundColor: Colors.grey[200],
+          foregroundColor: Colors.grey[600],
+          child: ImageIcon(AssetImage("assets/images/chef2.png")),
           onPressed: () {
             Navigator.push(
                 context,
@@ -82,23 +85,27 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: IconButton(
-              onPressed: () => _showIngredientsModal(context),
-              icon: Icon(Icons.cookie)),
+          leading: Text(''),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 24),
-              child: IconButton(
-                onPressed: () {
-                  // profile
-                },
-                icon: Icon(
-                  Icons.person,
-                  color: Colors.grey[800],
-                  size: 36,
-                ),
-              ),
-            )
+            IconButton(
+              onPressed: () => _showIngredientsModal(context),
+              icon: Icon(Icons.cookie),
+              iconSize: 30,
+              color: Colors.grey[600],
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(right: 24),
+            //   child: IconButton(
+            //     onPressed: () {
+            //       // profile
+            //     },
+            //     icon: Icon(
+            //       Icons.person,
+            //       color: Colors.grey[800],
+            //       size: 36,
+            //     ),
+            //   ),
+            // )
           ],
         ),
         body: Column(
@@ -112,18 +119,18 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   Text(
-                    'Welcome to ',
+                    'Food Kitchen',
                     style: TextStyle(
                       fontSize: 24,
                     ),
                   ),
-                  Text(
-                    'Food Kitchen',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                    ),
-                  ),
+                  // Text(
+                  //   'F',
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 30,
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -162,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showIngredientsModal(BuildContext context) async {
     showModalBottomSheet(
-        context: context,
+        context: context,  
         builder: (BuildContext context) {
           return RecipeOrFunFactPage();
         });
@@ -174,14 +181,119 @@ class ChatPage extends StatefulWidget {
   _ChatPageState createState() => _ChatPageState();
 }
 
+// class _ChatPageState extends State<ChatPage> {
+//   TextEditingController _messageController = TextEditingController();
+//   String _responseText = '';
+
+//   Future<void> _sendMessage() async {
+//     print("Bearer ${dotenv.env['token']}");
+//     setState(() {
+//       _responseText = 'Loading...';
+//     });
+
+//     final response = await http.post(
+//       Uri.parse('https://api.openai.com/v1/chat/completions'),
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': "Bearer ${dotenv.env['token']!.trim()}",
+//       },
+//       body: jsonEncode(
+//         {
+//           "model": "gpt-3.5-turbo",
+//           "messages": [
+//             {
+//               "role": "system",
+//               "content":
+//                   "Behave like a world class Chef. Answer only food related questions"
+//             },
+//             {"role": "user", "content": _messageController.text}
+//           ],
+//           "max_tokens": 250,
+//           "temperature": 0,
+//           "top_p": 1,
+//         },
+//       ),
+//     );
+
+//     final jsonResponse = jsonDecode(response.body);
+//     final assistantMessage = jsonResponse['choices'][0]['message']['content'];
+
+//     setState(() {
+//       _responseText = assistantMessage;
+//       _messageController.text='';
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Kitchen's Master Chef"),
+//       ),
+//       body: Column(
+//         children: [
+//           Expanded(
+//             child: ListView(
+//               reverse: true,
+//               children: [
+//                 _buildResponse(_responseText),
+//               ],
+//             ),
+//           ),
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: Row(
+//               children: [
+//                 Expanded(
+//                   child: TextField(
+//                     controller: _messageController,
+//                     decoration: InputDecoration(
+//                       hintText: 'Type your message...',
+//                       border: InputBorder.none,
+//                     ),
+//                     onSubmitted: (_) => _sendMessage(),
+//                   ),
+//                 ),
+//                 IconButton(
+//                   icon: Icon(Icons.send),
+//                   onPressed: _sendMessage,
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildResponse(String text) {
+//     return Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: Align(
+//         alignment: Alignment.centerLeft,
+//         child: Container(
+//           padding: EdgeInsets.all(12),
+//           decoration: BoxDecoration(
+//             color: Colors.blue.withOpacity(0.1),
+//             borderRadius: BorderRadius.circular(8),
+//           ),
+//           child: Text(
+//             text,
+//             style: TextStyle(fontSize: 16),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 class _ChatPageState extends State<ChatPage> {
   TextEditingController _messageController = TextEditingController();
-  String _responseText = '';
+  List<Map<String, String>> _chatHistory = [];
 
   Future<void> _sendMessage() async {
-    print("Bearer ${dotenv.env['token']}");
     setState(() {
-      _responseText = 'Loading...';
+      _chatHistory.add({"role": "user", "content": _messageController.text});
     });
 
     final response = await http.post(
@@ -212,7 +324,8 @@ class _ChatPageState extends State<ChatPage> {
     final assistantMessage = jsonResponse['choices'][0]['message']['content'];
 
     setState(() {
-      _responseText = assistantMessage;
+      _chatHistory.add({"role": "assistant", "content": assistantMessage});
+      _messageController.text = '';
     });
   }
 
@@ -220,16 +333,17 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('World Class Chef'),
+        title: Text("Kitchen's Master Chef"),
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView(
-              reverse: true,
-              children: [
-                _buildResponse(_responseText),
-              ],
+            child: ListView.builder(
+              itemCount: _chatHistory.length,
+              itemBuilder: (context, index) {
+                return _buildResponse(_chatHistory[index]['role']!,
+                    _chatHistory[index]['content']!);
+              },
             ),
           ),
           Padding(
@@ -240,7 +354,8 @@ class _ChatPageState extends State<ChatPage> {
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
-                      hintText: 'Type your message...',
+                      hintText: "Chat with Ai Master Chef...",
+                      border: InputBorder.none,
                     ),
                     onSubmitted: (_) => _sendMessage(),
                   ),
@@ -257,15 +372,19 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  Widget _buildResponse(String text) {
+  Widget _buildResponse(String role, String text) {
+    final isUser = role == 'user';
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Align(
-        alignment: Alignment.centerLeft,
+        alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            color: isUser
+                ? Colors.green.withOpacity(0.1)
+                : Colors.blue.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
