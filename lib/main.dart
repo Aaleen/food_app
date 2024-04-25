@@ -1,4 +1,6 @@
 import 'package:donut_app/screens/home_screen.dart';
+import 'package:donut_app/screens/login_screen.dart';
+import 'package:donut_app/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,8 +15,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Donut UI',
-      home: HomeScreen(),
+      title: 'Food App',
+      home: SplashScreen(),
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),
