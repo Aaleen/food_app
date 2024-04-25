@@ -1,4 +1,4 @@
-# Donut App UI
+# Food App UI
 
 ## Description
 
