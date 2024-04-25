@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:donut_app/models/response_model.dart';
+import 'package:donut_app/screens/funfact.dart';
 import 'package:donut_app/tabs/burger_tab.dart';
 import 'package:donut_app/tabs/donut_tab.dart';
 import 'package:donut_app/tabs/pancake_tab.dart';
@@ -5,6 +9,8 @@ import 'package:donut_app/tabs/pizza_tab.dart';
 import 'package:donut_app/tabs/smoothie_tab.dart';
 import 'package:donut_app/util/my_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,28 +47,44 @@ class _HomeScreenState extends State<HomeScreen> {
       iconPath: 'assets/icons/pizza.png',
     ),
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: myTabs.length,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.restaurant_menu),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatPage(),
+                ));
+          },
+        ),
+        // drawer: Drawer(
+        //     child: ListTile(
+        //   title: Text('Fact of the Day'),
+        //   onTap: () {
+        //     Navigator.push(
+        //         context,
+        //         MaterialPageRoute(
+        //           builder: (context) => RecipeOrFunFactPage(),
+        //         ));
+        //   },
+        // )),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 24),
-            child: IconButton(
-              onPressed: () {
-                // open drawer
-              },
-              icon: Icon(
-                Icons.menu,
-                color: Colors.grey[800],
-                size: 36,
-              ),
-            ),
-          ),
+          leading: IconButton(
+              onPressed: () => _showIngredientsModal(context),
+              icon: Icon(Icons.cookie)),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 24),
@@ -90,13 +112,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   Text(
-                    'I want to ',
+                    'Welcome to ',
                     style: TextStyle(
                       fontSize: 24,
                     ),
                   ),
                   Text(
-                    'EAT',
+                    'Food Kitchen',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -133,6 +155,123 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showIngredientsModal(BuildContext context) async {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return RecipeOrFunFactPage();
+        });
+  }
+}
+
+class ChatPage extends StatefulWidget {
+  @override
+  _ChatPageState createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  TextEditingController _messageController = TextEditingController();
+  String _responseText = '';
+
+  Future<void> _sendMessage() async {
+    print("Bearer ${dotenv.env['token']}");
+    setState(() {
+      _responseText = 'Loading...';
+    });
+
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer ${dotenv.env['token']!.trim()}",
+      },
+      body: jsonEncode(
+        {
+          "model": "gpt-3.5-turbo",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "Behave like a world class Chef. Answer only food related questions"
+            },
+            {"role": "user", "content": _messageController.text}
+          ],
+          "max_tokens": 250,
+          "temperature": 0,
+          "top_p": 1,
+        },
+      ),
+    );
+
+    final jsonResponse = jsonDecode(response.body);
+    final assistantMessage = jsonResponse['choices'][0]['message']['content'];
+
+    setState(() {
+      _responseText = assistantMessage;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('World Class Chef'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              reverse: true,
+              children: [
+                _buildResponse(_responseText),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(
+                      hintText: 'Type your message...',
+                    ),
+                    onSubmitted: (_) => _sendMessage(),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: _sendMessage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildResponse(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       ),
     );

@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
 
 class burgerTile extends StatelessWidget {
   final String burgerFlavor;
@@ -91,10 +95,13 @@ class burgerTile extends StatelessWidget {
                     Icons.favorite_outline,
                     color: Colors.pink,
                   ),
-              
+
                   // add button
-                  Icon(
-                    Icons.add,
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      _showIngredientsModal(context);
+                    },
                     color: Colors.grey[900],
                   ),
                 ],
@@ -103,6 +110,88 @@ class burgerTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showIngredientsModal(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: LottieBuilder.asset('assets/images/food.json'),
+        );
+      },
+    );
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${dotenv.env['token']!.trim()}',
+      },
+      body: jsonEncode(
+        {
+          "model": "gpt-3.5-turbo",
+          "messages": [
+            {
+              "role": "system",
+              "content":
+                  "Provide main ingredients of $burgerFlavor Burger only nothing else."
+            }
+          ],
+        },
+      ),
+    );
+
+    final jsonResponse = jsonDecode(response.body);
+    final ingredients = jsonResponse['choices'][0]['message']['content'];
+    // Close loading indicator
+    Navigator.of(context).pop();
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image
+                Image.asset(
+                  imageName,
+                  width: MediaQuery.of(context).size.width,
+                  height: 200,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 16),
+                // Name
+                Text(
+                  burgerFlavor,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                // Ingredients
+                Text(
+                  "Ingredients:",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  ingredients,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
